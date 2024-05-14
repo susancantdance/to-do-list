@@ -1,5 +1,5 @@
 // import {format} from 'date-fns';
-// import * as css from "./style.css";
+import * as css from "./style.css";
 //import {addTodo, createTodo, createProject, moveToProject, saveToLocal} from "./functions.js";
 
 function listen(project){
@@ -7,7 +7,7 @@ function listen(project){
     const inputBox = document.querySelector("#name");
     console.log(project.title);
     addButton.addEventListener('click', () => {
-       //addTodo(inputBox.value, projectName);
+       //addTodo(inputBox.value, currcurrProjectName);
         addToProject(createTodo(inputBox.value),project);
         displayProj(project);
     });
@@ -58,8 +58,8 @@ function createTodo(name, project, desc = '', due = '') {
     let title = name;
     let description = desc;
     let dueDate = due;
-    let projectName = project;
-    return {title, projectName, description, dueDate};
+    let currProjectName = project;
+    return {title, currProjectName, description, dueDate};
 }
 
 function deleteTodo(todo,proj){
@@ -88,17 +88,17 @@ function createProject(projName) {
 }
 
 function addToProject(todo,proj){
-    todo.projectName = proj.title;
+    todo.currProjectName = proj.title;
     proj.list.push(todo);
     console.log(`I added ${todo.title} to ${proj.title}`);
     saveToLocal(proj);
 }
 
-function moveToProject(todo,proj) {
-    let oldProject = {'title':todo.projectName,'list':JSON.parse(localStorage.getItem(todo.projectName))};
+function moveToProject(todo,newProj) {
+    let oldProject = {'title':todo.currProjectName,'list':JSON.parse(localStorage.getItem(todo.currProjectName))};
     console.log(`I'm about to delete from oldproject ${oldProject.title}`);
     deleteTodo(todo,oldProject);
-    addToProject(todo,proj);
+    addToProject(todo,newProj);
 
 }
 
