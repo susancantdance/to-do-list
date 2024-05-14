@@ -1,0 +1,58 @@
+FUNCTION
+    creates a TODO Object
+        title
+        description
+        duedate
+        priority
+        notes
+        checklist
+        etc
+    getters & setters
+
+FUNCTION
+    creates a project
+    stores lists of TODOs
+    getters & setters
+        rename project
+        add a TODO
+        remove a TODO
+        move a todo
+
+
+FUNCTION(S)
+    displays a project & and it's TODOs
+    View all projects.
+    View all todos in each project (probably just the title and duedate… perhaps changing color for different priorities).
+    Expand a single todo to see/edit its details.
+    Delete a todo.
+
+
+USE CASES
+    - add todo (to default project)
+        create todo and move it to 'default' project
+
+    - go into a project and add a todo 
+        create todo and move it to project
+
+    - edit a todo and change the project
+        move it to project
+
+    - add a project
+        create project
+
+    - SAVE changes
+
+    - delete todo 
+        remove from all projects
+        remove from localstorage
+
+    - view all projects 
+        display names of all projects (need to save outside of local storage?)
+
+    - view todos in each project 
+        display the list item in each project
+
+    - expand a single todo 
+        display all details
+        allow edit of each detail
+        save to todo

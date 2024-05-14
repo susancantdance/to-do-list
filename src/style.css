@@ -1,0 +1,25 @@
+.container {
+    display: grid;
+    grid-template-columns: 20% 80%;
+    grid-template-rows: 100%;
+}
+
+.main {
+    background-color: aqua;
+}
+
+.sidenav {
+    background-color: pink;
+}
+
+.entry {
+    background-color: beige;
+}
+
+.displayarea {
+    background-color: rgb(215, 179, 249);
+}
+
+.projlist {
+    background-color: darkgoldenrod;
+}
