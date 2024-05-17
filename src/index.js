@@ -7,7 +7,7 @@ function listen(project){
     const inputBox = document.querySelector("#name");
     console.log(project.title);
     addButton.addEventListener('click', () => {
-       //addTodo(inputBox.value, currcurrProjectName);
+       //addTodo(inputBox.value, currProjectName);
         addToProject(createTodo(inputBox.value),project);
         inputBox.value = '';
         displayProj(project);
@@ -24,18 +24,79 @@ function listenForNewProject() {
     });
 }
 
-function addListener(todoItem) {
+function addListener(todoItemNode, projName) {
     //const list = document.querySelector(".todos");
-    todoItem.addEventListener('click', () => {
-        const expandTodo = document.createElement("div");
-        expandTodo.textContent = "Edit";
-        todoItem.after(expandTodo);
+    todoItemNode.addEventListener('click', () => {
+        // const expandTodo = document.createElement("div");
+        // expandTodo.textContent = "Edit";
+        editMode(todoItemNode, projName);
+       // todoItem.after(expandTodo);
     });
-    console.log(todoItem);
-    return todoItem;
+    console.log(todoItemNode);
+    return todoItemNode;
 
 }
- 
+
+
+function editMode(todoItem, projName){
+
+    const foundTodo = lookupTodo(todoItem.textContent, projName);
+    const index = foundTodo.i;
+    var option = document.createElement("option");
+    
+
+    const list = document.querySelector(".todos");
+    const editTodoItem = document.createElement("span");
+    const editTitle = document.createElement("INPUT");
+    const editDescription = document.createElement("INPUT");
+    const editCurrProject = document.createElement("SELECT");
+    const saveButton = document.createElement("button");
+
+    editTitle.value = todoItem.textContent;
+    editTitle.setAttribute("type","text");
+    editTitle.setAttribute("placeholder","Add Title");
+    editTitle.setAttribute("class","titleInput");
+
+    editDescription.value = foundTodo.searchTodos[index].description;
+    editDescription.setAttribute("type","text");
+    editDescription.setAttribute("placeholder","Add Description");
+    editDescription.setAttribute("class","descInput");
+
+    editCurrProject.setAttribute("type","select-one");
+    
+    Object.keys(localStorage).forEach( (key) => {
+
+        let option = document.createElement("option");
+        option.textContent = key;
+        editCurrProject.add(option);
+    })
+
+    editCurrProject.value = projName;
+
+    saveButton.setAttribute("type","button");
+    saveButton.textContent = "Save";
+    saveButton.addEventListener('click', () => {
+        editTodo("title",editTitle.value,todoItem.textContent,projName);
+        editTodo("description",editDescription.value,todoItem.textContent,projName);
+        
+        if(editCurrProject.value !== projName) {
+            let lookup = lookupTodo(todoItem.textContent,projName);
+            let newProject = {"title":editCurrProject.value,"list":JSON.parse(localStorage.getItem(editCurrProject.value))};
+            console.log(`the todo we're moving is ${lookup.searchTodos[lookup.i].title}`);
+            moveToProject(lookup.searchTodos[lookup.i],newProject);
+        }
+    });
+
+
+    editTodoItem.appendChild(editTitle);
+    editTodoItem.appendChild(editDescription);
+    editTodoItem.appendChild(editCurrProject);
+    editTodoItem.appendChild(saveButton);
+
+
+    list.replaceChild(editTodoItem,todoItem);
+
+}
 
 function displayProj(proj){
 
@@ -48,7 +109,7 @@ function displayProj(proj){
     for(let i = 0; i<proj.list.length; i++){
         const displayTodoName = document.createElement("li");
         displayTodoName.textContent = proj.list[i].title;
-        const displayTodoWithListener = addListener(displayTodoName);
+        const displayTodoWithListener = addListener(displayTodoName, proj.title);
         list.appendChild(displayTodoWithListener);
         console.log(proj.list[i].title);
     }
@@ -65,7 +126,7 @@ function displayProjects() {
         const p = document.createElement("li");
         p.textContent = key;
         projList.appendChild(p);
-    })
+    });
 }
 
 
@@ -84,6 +145,7 @@ function deleteTodo(todo,proj){
     searchResults.searchTodos.splice(searchResults.i,1);
     proj.list = searchResults.searchTodos.slice();
     saveToLocal(proj);
+
     
 }
 
@@ -118,8 +180,9 @@ function addToProject(todo,proj){
 function moveToProject(todo,newProj) {
     let oldProject = {'title':todo.currProjectName,'list':JSON.parse(localStorage.getItem(todo.currProjectName))};
     console.log(`I'm about to delete from oldproject ${oldProject.title}`);
-    deleteTodo(todo,oldProject);
     addToProject(todo,newProj);
+    deleteTodo(todo,oldProject);
+  
 
 }
 
@@ -136,6 +199,9 @@ function editTodo(attribute, newValue, todoName, projName){
             break;
         case "description":
             searchResults.searchTodos[searchResults.i].description = newValue;
+            break;
+        case "currProjName":
+            searchResults.searchTodos[searchResults.i].currProjectName = newValue;
             break;
     }
 

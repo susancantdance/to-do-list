@@ -32,3 +32,11 @@ li {
     border-style: solid;
     border-color: black;
 }
+
+.titleInput {
+    width: 75px;
+}
+
+.descInput {
+    width: 150px;
+}
