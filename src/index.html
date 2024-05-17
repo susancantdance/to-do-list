@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- <link rel="stylesheet" href="style.css">  -->
 </head>
 <body>
     <div class="container">
-        <div class="sidenav">Other Projects
+        <div class="sidenav">
+            <span class="title">Other Projects</span>
+            <div class="addproject">
+                <label>Add a Project
+                    <input id="projectname" type="text"></input>
+                </label>
+                <button type="button" class="addprojectbutt">Add Project</button>
+            </div>
             <ul class="projlist">
             </ul>
         </div>
@@ -20,17 +27,17 @@
                         <label>Add something to do.
                             <input id="name" type="text"></input>
                         </label>
-                        <button type="button">Add</button>
+                        <button type="button" class="addtodo">Add</button>
                     </form>
                 </div>
             </div>
             <div class="displayarea">
-                <div class="projname">Inbox</div>
-                <div class="todos"></div>
+                <div class="projname"><span class="title projnamespan">Inbox</span></div>
+                <div class="todosdiv"><ul class="todos"></ul></div>
             </div>
         </div>
         
     </div>
-    <script src="index.js"></script>
+    <!-- <script src="index.js"></script> -->
 </body>
 </html>

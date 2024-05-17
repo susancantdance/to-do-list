@@ -3,29 +3,53 @@ import * as css from "./style.css";
 //import {addTodo, createTodo, createProject, moveToProject, saveToLocal} from "./functions.js";
 
 function listen(project){
-    const addButton = document.querySelector("button");
+    const addButton = document.querySelector(".addtodo");
     const inputBox = document.querySelector("#name");
     console.log(project.title);
     addButton.addEventListener('click', () => {
        //addTodo(inputBox.value, currcurrProjectName);
         addToProject(createTodo(inputBox.value),project);
+        inputBox.value = '';
         displayProj(project);
     });
+}
+
+function listenForNewProject() {
+    const addProjButton = document.querySelector(".addprojectbutt");
+    const addProjInput = document.querySelector("#projectname");
+
+    addProjButton.addEventListener('click', () => {
+        createProject(addProjInput.value);
+        addProjInput.value = '';
+    });
+}
+
+function addListener(todoItem) {
+    //const list = document.querySelector(".todos");
+    todoItem.addEventListener('click', () => {
+        const expandTodo = document.createElement("div");
+        expandTodo.textContent = "Edit";
+        todoItem.after(expandTodo);
+    });
+    console.log(todoItem);
+    return todoItem;
+
 }
  
 
 function displayProj(proj){
 
-    document.querySelector("div.projname").textContent = "";
-    document.querySelector("div.projname").textContent = proj.title;
+    document.querySelector(".projnamespan").textContent = "";
+    document.querySelector(".projnamespan").textContent = proj.title;
 
-    document.querySelector("div.todos").textContent = "";
-    const div = document.querySelector("div.todos");
+    document.querySelector(".todos").textContent = "";
+    const list = document.querySelector(".todos");
 
     for(let i = 0; i<proj.list.length; i++){
-        const displayTodoName = document.createElement("p");
+        const displayTodoName = document.createElement("li");
         displayTodoName.textContent = proj.list[i].title;
-        div.appendChild(displayTodoName);
+        const displayTodoWithListener = addListener(displayTodoName);
+        list.appendChild(displayTodoWithListener);
         console.log(proj.list[i].title);
     }
     
@@ -44,15 +68,6 @@ function displayProjects() {
     })
 }
 
-// function addTodo(todoName, projName){
-//     console.log(`projName is ${projName}`);
-//     let myTodo = createTodo(todoName);
-//     const myProject = {"title":projName, "list":JSON.parse(localStorage.getItem(projName))};
-//     moveToProject(myTodo,myProject);
-//     saveToLocal(myProject);
-//     displayProj(myProject);
-
-// }
 
 function createTodo(name, project, desc = '', due = '') {
     let title = name;
@@ -63,19 +78,25 @@ function createTodo(name, project, desc = '', due = '') {
 }
 
 function deleteTodo(todo,proj){
-    console.log(`project title is ${proj.title} and todo is ${todo.title}`);
-    console.log(JSON.parse(localStorage.getItem(proj.title)));
-    let todoList = JSON.parse(localStorage.getItem(proj.title));
-
-    for(let i=0; i< todoList.length; i++){
-        if(todoList[i].title == todo.title){
-            console.log("we have fart and fart!!!");
-            todoList.splice(i,1);
-        }
-    }
-    proj.list = todoList;
+    //console.log(`In DeleteTodo and project title is ${proj.title} and todo is ${todo.title}`);
+    //console.log(JSON.parse(localStorage.getItem(proj.title)));
+    let searchResults = lookupTodo(todo.title, proj.title);
+    searchResults.searchTodos.splice(searchResults.i,1);
+    proj.list = searchResults.searchTodos.slice();
     saveToLocal(proj);
     
+}
+
+function lookupTodo(todoTitle, projTitle){
+    console.log('In the lookupTodo function');
+    let searchTodos = JSON.parse(localStorage.getItem(projTitle)).slice();
+    for(let i=0; i< searchTodos.length; i++){
+        if(searchTodos[i].title == todoTitle){
+            console.log(`we have located the todo item which is ${searchTodos[i].title}`);
+            let foundTodo = searchTodos[i];
+            return { searchTodos, i };
+        }
+    }
 }
 
 function createProject(projName) {
@@ -103,8 +124,24 @@ function moveToProject(todo,newProj) {
 }
 
 function saveToLocal(proj){
-    console.log(`SavetoLocal Function and project title is ${proj.title} and list is ${proj.list}`);
+    console.log(`In the SavetoLocal Function and project title is ${proj.title} and list is ${proj.list}`);
     localStorage.setItem(proj.title, JSON.stringify(proj.list));
 }
 
+function editTodo(attribute, newValue, todoName, projName){
+    let searchResults = lookupTodo(todoName, projName);
+    switch (attribute) {
+        case "title":
+            searchResults.searchTodos[searchResults.i].title = newValue;
+            break;
+        case "description":
+            searchResults.searchTodos[searchResults.i].description = newValue;
+            break;
+    }
+
+    let newList = searchResults.searchTodos.slice();
+    saveToLocal({"title":projName, "list":newList});
+}
+
 listen(createProject("Inbox"));
+listenForNewProject();

@@ -1,6 +1,6 @@
 .container {
     display: grid;
-    grid-template-columns: 20% 80%;
+    grid-template-columns: 30% 70%;
     grid-template-rows: 100%;
 }
 
@@ -10,6 +10,10 @@
 
 .sidenav {
     background-color: pink;
+}
+
+.title {
+    font-size: 30px;
 }
 
 .entry {
@@ -22,4 +26,9 @@
 
 .projlist {
     background-color: darkgoldenrod;
+}
+
+li {
+    border-style: solid;
+    border-color: black;
 }
