@@ -1,7 +1,10 @@
 // import {format} from 'date-fns';
 import * as css from "./style.css";
-//import {addTodo, createTodo, createProject, moveToProject, saveToLocal} from "./functions.js";
+import {createTodo, addToProject, createProject, moveToProject, editTodo, saveToLocal, deleteTodo, lookupTodo} from "./functions.js";
 
+
+//Listen for new todos in a given project
+//params: project object
 function listen(project){
     const addButton = document.querySelector(".addtodo");
     const inputBox = document.querySelector("#name");
@@ -14,6 +17,7 @@ function listen(project){
     });
 }
 
+//Listen for new projects
 function listenForNewProject() {
     const addProjButton = document.querySelector(".addprojectbutt");
     const addProjInput = document.querySelector("#projectname");
@@ -24,12 +28,14 @@ function listenForNewProject() {
     });
 }
 
-function addListener(todoItemNode, projName) {
+//Add a listener for each todo listed under a project
+//params: (node containing todo <li>, title of project)
+function addListener(todoItemNode, projTitle) {
     //const list = document.querySelector(".todos");
     todoItemNode.addEventListener('click', () => {
         // const expandTodo = document.createElement("div");
         // expandTodo.textContent = "Edit";
-        editMode(todoItemNode, projName);
+        editMode(todoItemNode, projTitle);
        // todoItem.after(expandTodo);
     });
     console.log(todoItemNode);
@@ -37,10 +43,11 @@ function addListener(todoItemNode, projName) {
 
 }
 
+//Replace the todo in project list with input fields so user can edit
+//params: (node containing todo <li>, title of project)
+function editMode(todoItemNode, projTitle){
 
-function editMode(todoItem, projName){
-
-    const foundTodo = lookupTodo(todoItem.textContent, projName);
+    const foundTodo = lookupTodo(todoItemNode.textContent, projTitle);
     const index = foundTodo.i;
     var option = document.createElement("option");
     
@@ -52,7 +59,7 @@ function editMode(todoItem, projName){
     const editCurrProject = document.createElement("SELECT");
     const saveButton = document.createElement("button");
 
-    editTitle.value = todoItem.textContent;
+    editTitle.value = todoItemNode.textContent;
     editTitle.setAttribute("type","text");
     editTitle.setAttribute("placeholder","Add Title");
     editTitle.setAttribute("class","titleInput");
@@ -71,20 +78,18 @@ function editMode(todoItem, projName){
         editCurrProject.add(option);
     })
 
-    editCurrProject.value = projName;
+    editCurrProject.value = projTitle;
 
     saveButton.setAttribute("type","button");
     saveButton.textContent = "Save";
     saveButton.addEventListener('click', () => {
-        editTodo("title",editTitle.value,todoItem.textContent,projName);
-        editTodo("description",editDescription.value,todoItem.textContent,projName);
+
+        let updatedTodo = createTodo(editTitle.value, projTitle, editDescription.value);
+        let updatedProject = {"title":editCurrProject.value,"list":JSON.parse(localStorage.getItem(editCurrProject.value))};
         
-        if(editCurrProject.value !== projName) {
-            let lookup = lookupTodo(todoItem.textContent,projName);
-            let newProject = {"title":editCurrProject.value,"list":JSON.parse(localStorage.getItem(editCurrProject.value))};
-            console.log(`the todo we're moving is ${lookup.searchTodos[lookup.i].title}`);
-            moveToProject(lookup.searchTodos[lookup.i],newProject);
-        }
+        if (editCurrProject.value !== projTitle) moveToProject(updatedTodo, updatedProject);
+        else editTodo(updatedTodo);
+        
     });
 
 
@@ -94,29 +99,31 @@ function editMode(todoItem, projName){
     editTodoItem.appendChild(saveButton);
 
 
-    list.replaceChild(editTodoItem,todoItem);
+    list.replaceChild(editTodoItem,todoItemNode);
 
 }
 
-function displayProj(proj){
+//display a project and all of its todos
+//params: project object
+function displayProj(project){
 
     document.querySelector(".projnamespan").textContent = "";
-    document.querySelector(".projnamespan").textContent = proj.title;
+    document.querySelector(".projnamespan").textContent = project.title;
 
     document.querySelector(".todos").textContent = "";
     const list = document.querySelector(".todos");
 
-    for(let i = 0; i<proj.list.length; i++){
+    for(let i = 0; i<project.list.length; i++){
         const displayTodoName = document.createElement("li");
-        displayTodoName.textContent = proj.list[i].title;
-        const displayTodoWithListener = addListener(displayTodoName, proj.title);
+        displayTodoName.textContent = project.list[i].title;
+        const displayTodoWithListener = addListener(displayTodoName, project.title);
         list.appendChild(displayTodoWithListener);
-        console.log(proj.list[i].title);
+        console.log(project.list[i].title);
     }
     
 }
 
-
+//display list of projects in the sidenav
 function displayProjects() {
 
     const projList = document.querySelector(".projlist");
@@ -130,84 +137,6 @@ function displayProjects() {
 }
 
 
-function createTodo(name, project, desc = '', due = '') {
-    let title = name;
-    let description = desc;
-    let dueDate = due;
-    let currProjectName = project;
-    return {title, currProjectName, description, dueDate};
-}
-
-function deleteTodo(todo,proj){
-    //console.log(`In DeleteTodo and project title is ${proj.title} and todo is ${todo.title}`);
-    //console.log(JSON.parse(localStorage.getItem(proj.title)));
-    let searchResults = lookupTodo(todo.title, proj.title);
-    searchResults.searchTodos.splice(searchResults.i,1);
-    proj.list = searchResults.searchTodos.slice();
-    saveToLocal(proj);
-
-    
-}
-
-function lookupTodo(todoTitle, projTitle){
-    console.log('In the lookupTodo function');
-    let searchTodos = JSON.parse(localStorage.getItem(projTitle)).slice();
-    for(let i=0; i< searchTodos.length; i++){
-        if(searchTodos[i].title == todoTitle){
-            console.log(`we have located the todo item which is ${searchTodos[i].title}`);
-            let foundTodo = searchTodos[i];
-            return { searchTodos, i };
-        }
-    }
-}
-
-function createProject(projName) {
-    let title = projName;
-    let list = [];
-    console.log(`I created a project named ${projName}`);
-    saveToLocal({title, list});
-    displayProjects();
-    return {title, list};
-}
-
-function addToProject(todo,proj){
-    todo.currProjectName = proj.title;
-    proj.list.push(todo);
-    console.log(`I added ${todo.title} to ${proj.title}`);
-    saveToLocal(proj);
-}
-
-function moveToProject(todo,newProj) {
-    let oldProject = {'title':todo.currProjectName,'list':JSON.parse(localStorage.getItem(todo.currProjectName))};
-    console.log(`I'm about to delete from oldproject ${oldProject.title}`);
-    addToProject(todo,newProj);
-    deleteTodo(todo,oldProject);
-  
-
-}
-
-function saveToLocal(proj){
-    console.log(`In the SavetoLocal Function and project title is ${proj.title} and list is ${proj.list}`);
-    localStorage.setItem(proj.title, JSON.stringify(proj.list));
-}
-
-function editTodo(attribute, newValue, todoName, projName){
-    let searchResults = lookupTodo(todoName, projName);
-    switch (attribute) {
-        case "title":
-            searchResults.searchTodos[searchResults.i].title = newValue;
-            break;
-        case "description":
-            searchResults.searchTodos[searchResults.i].description = newValue;
-            break;
-        case "currProjName":
-            searchResults.searchTodos[searchResults.i].currProjectName = newValue;
-            break;
-    }
-
-    let newList = searchResults.searchTodos.slice();
-    saveToLocal({"title":projName, "list":newList});
-}
 
 listen(createProject("Inbox"));
 listenForNewProject();
