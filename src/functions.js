@@ -1,7 +1,9 @@
+ import {displayProjects} from "./index.js";
+
 //create a new todo object
 //params: (title of todo,current project name, description, duedate)
 function createTodo(title, currProjectName, description = '', dueDate = '') {
- 
+    
     return {title, currProjectName, description, dueDate};
 }
 
@@ -21,9 +23,13 @@ function deleteTodo(todo,project){
 //params: (todo title, project title)
 //returns: a new object that has the list & the index of todo in question (DO I NEED TO RETURN THE LIST?)
 function lookupTodo(todoTitle, projTitle){
-    console.log('In the lookupTodo function');
+    console.log(`In the lookupTodo function (${todoTitle}, ${projTitle}`);
     let searchTodos = JSON.parse(localStorage.getItem(projTitle)).slice();
-    for(let i=0; i< searchTodos.length; i++){
+    console.log(`searchTodos.length is ${searchTodos} and is an Array? ${Array.isArray(searchTodos)}`);
+    
+    for(let i = 0; i < searchTodos.length; i++){
+        console.log('in the for loop');
+        console.log(`searchTodos[i] is ${searchTodos[i].title} and length is ${searchTodos.length} and todoTitle is ${todoTitle}`);
         if(searchTodos[i].title == todoTitle){
             console.log(`we have located the todo item which is ${searchTodos[i].title}`);
             let foundTodo = searchTodos[i];
@@ -47,9 +53,10 @@ function createProject(projName) {
 //Add a todo to a project
 //params: (todo object, project object)
 function addToProject(todo,proj){
+    proj.list = JSON.parse(localStorage.getItem(proj.title)).slice();
     todo.currProjectName = proj.title;
     proj.list.push(todo);
-    console.log(`I added ${todo.title} to ${proj.title}`);
+    console.log(`I added ${todo.title} to ${proj.title} array[o] is ${proj.list[0].title}`);
     saveToLocal(proj);
 }
 
@@ -91,14 +98,15 @@ function saveToLocal(project){
 // }
 
 function editTodo(todo) {
-    let results = lookupTodo(todo.title, todo.currProjName);
-    let newList = results.searchTodos.splice();
+    console.log(`editTodo (${todo.title},${todo.currProjectName},${todo.description})`);
+    let results = lookupTodo(todo.title, todo.currProjectName);
+    let newList = results.searchTodos.slice();
     let i = results.i;
     newList[i].title = todo.title;
     newList[i].description = todo.description;
-    newList[i].currProjName = todo.currProjName;
+    newList[i].currProjectName = todo.currProjectName;
 
-    let updatedProject = {"title":todo.currProjName,"list":newList};
+    let updatedProject = {"title":todo.currProjectName,"list":newList};
     saveToLocal(updatedProject);
 }
 
