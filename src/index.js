@@ -1,6 +1,6 @@
 // import {format} from 'date-fns';
  import * as css from "./style.css";
- import {createTodo, addToProject, createProject, moveToProject, editTodo, saveToLocal, deleteTodo, lookupTodo} from "./functions.js";
+ import {createTodo, deleteProject, addToProject, createProject, moveToProject, editTodo, saveToLocal, deleteTodo, lookupTodo} from "./functions.js";
 
 
 //Listen for new todos in a given project
@@ -191,12 +191,28 @@ function displayProjects() {
     projList.innerHTML = '';
     
     Object.keys(localStorage).forEach( (key) => {
-        const p = document.createElement("li");
+        const li = document.createElement("li");
+        const p = document.createElement("span");
+        let deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+
         p.textContent = key;
         p.addEventListener('click', () => {
             displayProj(key);
         });
-        projList.appendChild(p);
+
+       
+        deleteButton.addEventListener('click', () => {
+            deleteProject(key);
+            displayProj("Inbox");
+            displayProjects();
+        });
+
+        
+        li.appendChild(p);
+        if(key !== "Inbox") li.appendChild(deleteButton);
+        projList.appendChild(li);
+        
     });
 
 }

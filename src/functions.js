@@ -2,7 +2,7 @@
 
 //create a new todo object
 //params: (title of todo,current project name, description, duedate)
-function createTodo(title, currProjectName, description = '', index = 0, dueDate = '', priority = 'medium') {
+function createTodo(title, currProjectName, description = '', index = 0, dueDate = 'mm/dd/yy', priority = 'medium') {
     
     return {title, currProjectName, description, index, dueDate, priority};
 }
@@ -18,6 +18,10 @@ function deleteTodo(todo,project){
     project.list.splice(todo.index,1);
     saveToLocal(project);
 
+}
+
+function deleteProject(projTitle) {
+    localStorage.removeItem(projTitle);
 }
 
 //Find a specific todo in the project object list to manipulate further
@@ -106,5 +110,6 @@ export {
     createProject,
     addToProject,
     moveToProject,
-    saveToLocal
+    saveToLocal,
+    deleteProject
 };
