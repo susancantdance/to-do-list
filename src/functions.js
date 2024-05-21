@@ -2,9 +2,9 @@
 
 //create a new todo object
 //params: (title of todo,current project name, description, duedate)
-function createTodo(title, currProjectName, description = '', dueDate = '') {
+function createTodo(title, currProjectName, description = '', index = 0) {
     
-    return {title, currProjectName, description, dueDate};
+    return {title, currProjectName, description, index};
 }
 
 //remove a todo object from a project object
@@ -12,9 +12,10 @@ function createTodo(title, currProjectName, description = '', dueDate = '') {
 function deleteTodo(todo,project){
     //console.log(`In DeleteTodo and project title is ${proj.title} and todo is ${todo.title}`);
     //console.log(JSON.parse(localStorage.getItem(proj.title)));
-    let searchResults = lookupTodo(todo.title, project.title);
-    searchResults.searchTodos.splice(searchResults.i,1);
-    project.list = searchResults.searchTodos.slice();
+    // let searchResults = lookupTodo(todo.title, project.title);
+    // searchResults.searchTodos.splice(searchResults.i,1);
+    // project.list = searchResults.searchTodos.slice();
+    project.list.splice(todo.index,1);
     saveToLocal(project);
 
 }
@@ -55,8 +56,9 @@ function createProject(projName) {
 function addToProject(todo,proj){
     proj.list = JSON.parse(localStorage.getItem(proj.title)).slice();
     todo.currProjectName = proj.title;
+    todo.index = proj.list.length; 
     proj.list.push(todo);
-    console.log(`I added ${todo.title} to ${proj.title} array[o] is ${proj.list[0].title}`);
+    console.log(`I added ${todo.title} to ${proj.title} the index is ${todo.index} and title in array is ${proj.list[todo.index].title}`);
     saveToLocal(proj);
 }
 
@@ -77,31 +79,15 @@ function saveToLocal(project){
     localStorage.setItem(project.title, JSON.stringify(project.list));
 }
 
-//Edits the todo and saves it to local
-//parmas: attribute to update, value to assign to attribute, name of todo, name of project
-// function editTodo(attribute, newValue, todoName, projName){
-//     let searchResults = lookupTodo(todoName, projName);
-//     switch (attribute) {
-//         case "title":
-//             searchResults.searchTodos[searchResults.i].title = newValue;
-//             break;
-//         case "description":
-//             searchResults.searchTodos[searchResults.i].description = newValue;
-//             break;
-//         case "currProjName":
-//             searchResults.searchTodos[searchResults.i].currProjectName = newValue;
-//             break;
-//     }
 
-//     let newList = searchResults.searchTodos.slice();
-//     saveToLocal({"title":projName, "list":newList});
-// }
-
+//Edits todo and saves to local
+//params: todo object
 function editTodo(todo) {
-    console.log(`editTodo (${todo.title},${todo.currProjectName},${todo.description})`);
-    let results = lookupTodo(todo.title, todo.currProjectName);
-    let newList = results.searchTodos.slice();
-    let i = results.i;
+    console.log(`editTodo (${todo.title},${todo.currProjectName},${todo.description},${todo.index})`);
+    // let results = lookupTodo(todo.title, todo.currProjectName);
+    // let newList = results.searchTodos.slice();
+    let newList = JSON.parse(localStorage.getItem(todo.currProjectName)).slice();
+    let i = todo.index;
     newList[i].title = todo.title;
     newList[i].description = todo.description;
     newList[i].currProjectName = todo.currProjectName;

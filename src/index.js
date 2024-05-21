@@ -34,14 +34,14 @@ function listenForNewProject() {
 
 //Add a listener for each todo listed under a project
 //params: (node containing todo <li>, title of project)
-function addListener(todoItemNode, displayTodoName, projTitle) {
+function addListener(todoItemNode, displayTodoName, projTitle, i) {
     
     todoItemNode.addEventListener('click', () => {
         // const expandTodo = document.createElement("div");
         // expandTodo.textContent = "Edit";
         console.log(`addEventListener (${todoItemNode}, ${projTitle})`);
 
-        editMode(todoItemNode, displayTodoName, projTitle);
+        editMode(todoItemNode, displayTodoName, projTitle, i);
        // todoItem.after(expandTodo);
     });
     console.log(todoItemNode);
@@ -51,10 +51,11 @@ function addListener(todoItemNode, displayTodoName, projTitle) {
 
 //Replace the todo in project list with input fields so user can edit
 //params: (node containing todo <li>, title of project)
-function editMode(todoItemNode, todoName, projTitle){
-    console.log(`editMode (${todoName.textContent}, ${projTitle})`);
-    const foundTodo = lookupTodo(todoName.textContent, projTitle);
-    const index = foundTodo.i;
+function editMode(todoItemNode, todoName, projTitle, i){
+    console.log(`editMode (${todoName.textContent}, ${projTitle}, ${i})`);
+    // const foundTodo = lookupTodo(todoName.textContent, projTitle);
+    // const index = foundTodo.i;
+    const projectList = JSON.parse(localStorage.getItem(projTitle)).slice();
 
     const list = document.querySelector(".todos");
     const editTodoItem = document.createElement("span");
@@ -68,7 +69,7 @@ function editMode(todoItemNode, todoName, projTitle){
     editTitle.setAttribute("placeholder","Add Title");
     editTitle.setAttribute("class","titleInput");
 
-    editDescription.value = foundTodo.searchTodos[index].description;
+    editDescription.value = projectList[i].description;
     editDescription.setAttribute("type","text");
     editDescription.setAttribute("placeholder","Add Description");
     editDescription.setAttribute("class","descInput");
@@ -88,7 +89,7 @@ function editMode(todoItemNode, todoName, projTitle){
     saveButton.textContent = "Save";
     saveButton.addEventListener('click', () => {
         console.log(`now we create a todo using these params (${editTitle.value} ${projTitle} ${editDescription.value})`);
-        let updatedTodo = createTodo(editTitle.value, projTitle, editDescription.value);
+        let updatedTodo = createTodo(editTitle.value, projTitle, editDescription.value, i);
         let updatedProject = {"title":editCurrProject.value,"list":JSON.parse(localStorage.getItem(editCurrProject.value))};
         
         console.log(`updatedTodo title ${updatedTodo.title} currProjName ${updatedTodo.currProjectName} desc ${updatedTodo.description}`);
@@ -136,7 +137,7 @@ function displayProj(projTitle){
         displayTodo.appendChild(displayTodoName);
         displayTodo.appendChild(displayColon);
         displayTodo.appendChild(displayTodoDesc);
-        const displayTodoWithListener = addListener(displayTodo, displayTodoName, projTitle);
+        const displayTodoWithListener = addListener(displayTodo, displayTodoName, projTitle, i);
         list.appendChild(displayTodoWithListener);
     }
     
