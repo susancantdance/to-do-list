@@ -61,8 +61,11 @@ function editMode(todoItemNode, todoName, projTitle, i){
     const editTodoItem = document.createElement("span");
     const editTitle = document.createElement("INPUT");
     const editDescription = document.createElement("INPUT");
+    const editDueDate = document.createElement("INPUT");
+    const editPriority = document.createElement("SELECT");
     const editCurrProject = document.createElement("SELECT");
     const saveButton = document.createElement("button");
+    const deleteButton = document.createElement("button");
 
     editTitle.value = todoName.textContent;
     editTitle.setAttribute("type","text");
@@ -73,6 +76,31 @@ function editMode(todoItemNode, todoName, projTitle, i){
     editDescription.setAttribute("type","text");
     editDescription.setAttribute("placeholder","Add Description");
     editDescription.setAttribute("class","descInput");
+    
+    editDueDate.value = projectList[i].dueDate;
+    editDueDate.setAttribute("type","text");
+    editDueDate.setAttribute("placeholder","Add duedate");
+    editDueDate.setAttribute("class","duedateInput");
+
+    
+    editPriority.setAttribute("placeholder","Add priority");
+    editPriority.setAttribute("class","duedatePriority");
+    editPriority.setAttribute("type","select-one");
+
+    let high = document.createElement("option");
+    let medium = document.createElement("option");
+    let low = document.createElement("option");
+
+    high.textContent = "high";
+    medium.textContent = "medium";
+    low.textContent = "low";
+
+    editPriority.add(high);
+    editPriority.add(medium);
+    editPriority.add(low);
+
+    editPriority.value = projectList[i].priority;
+
 
     editCurrProject.setAttribute("type","select-one");
     
@@ -89,7 +117,7 @@ function editMode(todoItemNode, todoName, projTitle, i){
     saveButton.textContent = "Save";
     saveButton.addEventListener('click', () => {
         console.log(`now we create a todo using these params (${editTitle.value} ${projTitle} ${editDescription.value})`);
-        let updatedTodo = createTodo(editTitle.value, projTitle, editDescription.value, i);
+        let updatedTodo = createTodo(editTitle.value, projTitle, editDescription.value, i, editDueDate.value, editPriority.value);
         let updatedProject = {"title":editCurrProject.value,"list":JSON.parse(localStorage.getItem(editCurrProject.value))};
         
         console.log(`updatedTodo title ${updatedTodo.title} currProjName ${updatedTodo.currProjectName} desc ${updatedTodo.description}`);
@@ -101,11 +129,24 @@ function editMode(todoItemNode, todoName, projTitle, i){
         
     });
 
+    deleteButton.setAttribute("type","button");
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener('click', () => {
+        let todoToDelete = createTodo('', projTitle, '', i);
+        let projectToDeleteFrom = {"title":projTitle, "list":JSON.parse(localStorage.getItem(projTitle))};
+        deleteTodo(todoToDelete, projectToDeleteFrom);
+        displayProj(projTitle);
+    });
+
+
 
     editTodoItem.appendChild(editTitle);
     editTodoItem.appendChild(editDescription);
+    editTodoItem.appendChild(editDueDate);
+    editTodoItem.appendChild(editPriority);
     editTodoItem.appendChild(editCurrProject);
     editTodoItem.appendChild(saveButton);
+    editTodoItem.appendChild(deleteButton);
 
     const todoListItem = document.createElement('li');
     todoListItem.appendChild(editTodoItem);
@@ -117,7 +158,7 @@ function editMode(todoItemNode, todoName, projTitle, i){
 //display a project and all of its todos
 //params: project object
 function displayProj(projTitle){
-
+    console.log(`i'm in the display Proj function and projTitle is ${projTitle}`);
     let projList = JSON.parse(localStorage.getItem(projTitle)).slice();
 
     document.querySelector(".projnamespan").textContent = "";

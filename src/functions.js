@@ -2,9 +2,9 @@
 
 //create a new todo object
 //params: (title of todo,current project name, description, duedate)
-function createTodo(title, currProjectName, description = '', index = 0) {
+function createTodo(title, currProjectName, description = '', index = 0, dueDate = '', priority = 'medium') {
     
-    return {title, currProjectName, description, index};
+    return {title, currProjectName, description, index, dueDate, priority};
 }
 
 //remove a todo object from a project object
@@ -90,6 +90,8 @@ function editTodo(todo) {
     let i = todo.index;
     newList[i].title = todo.title;
     newList[i].description = todo.description;
+    newList[i].dueDate = todo.dueDate;
+    newList[i].priority = todo.priority;
     newList[i].currProjectName = todo.currProjectName;
 
     let updatedProject = {"title":todo.currProjectName,"list":newList};
