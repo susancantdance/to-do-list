@@ -2,8 +2,8 @@
 
 //create a new todo object
 //params: (title of todo,current project name, description, duedate)
-function createTodo(title, currProjectName, description = '', index = 0, dueDate = 'mm/dd/yy', priority = 'medium') {
-    
+function createTodo(title, currProjectName, description = '', index = 0, dueDate = '', priority = 'medium') {
+    console.log(`create todo ${currProjectName}`);
     return {title, currProjectName, description, index, dueDate, priority};
 }
 

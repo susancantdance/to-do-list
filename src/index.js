@@ -14,7 +14,7 @@ function listen(){
         const projectTitle = document.querySelector(".projnamespan");
         console.log(`listen function ${projectTitle.textContent}`);
         const project = {"title":projectTitle.textContent, "list":JSON.parse(localStorage.getItem(projectTitle.textContent)).slice()};
-        addToProject(createTodo(inputBox.value),project);
+        addToProject(createTodo(inputBox.value,projectTitle.textContent),project);
         inputBox.value = '';
         displayProj(project.title);
     });
@@ -39,13 +39,50 @@ function addListener(todoItemNode, displayTodoName, projTitle, i) {
     todoItemNode.addEventListener('click', () => {
         // const expandTodo = document.createElement("div");
         // expandTodo.textContent = "Edit";
-        console.log(`addEventListener (${todoItemNode}, ${projTitle})`);
+        console.log(`addEventListener (${todoItemNode.textContent}, ${projTitle})`);
 
         editMode(todoItemNode, displayTodoName, projTitle, i);
        // todoItem.after(expandTodo);
     });
     console.log(todoItemNode);
     return todoItemNode;
+
+}
+
+function editTodoPriority(todo) {
+    const dropdown = document.createElement("SELECT");
+    dropdown.setAttribute("placeholder","Add priority");
+    dropdown.setAttribute("class","duedatePriority");
+    dropdown.setAttribute("type","select-one");
+
+    let high = document.createElement("option");
+    let medium = document.createElement("option");
+    let low = document.createElement("option");
+
+    high.textContent = "high";
+    medium.textContent = "medium";
+    low.textContent = "low";
+
+    dropdown.add(high);
+    dropdown.add(medium);
+    dropdown.add(low);
+
+    dropdown.value = todo.priority;
+    return dropdown;
+}
+
+function editTodoCurrProject() {
+    const todo = document.createElement("SELECT");
+    todo.setAttribute("type","select-one");
+    
+    Object.keys(localStorage).forEach( (key) => {
+
+        let option = document.createElement("option");
+        option.textContent = key;
+        todo.add(option);
+    });
+
+    return todo;
 
 }
 
@@ -57,13 +94,20 @@ function editMode(todoItemNode, todoName, projTitle, i){
     // const index = foundTodo.i;
     const projectList = JSON.parse(localStorage.getItem(projTitle)).slice();
 
-    const list = document.querySelector(".todos");
+    const list = document.querySelector(".todoslist");
+
+
     const editTodoItem = document.createElement("span");
+    const lineBreak = document.createElement("p");
     const editTitle = document.createElement("INPUT");
     const editDescription = document.createElement("INPUT");
     const editDueDate = document.createElement("INPUT");
-    const editPriority = document.createElement("SELECT");
-    const editCurrProject = document.createElement("SELECT");
+
+
+    const editPriority = editTodoPriority(projectList[i]);
+    const editCurrProject = editTodoCurrProject();
+    editCurrProject.value = projTitle;
+    
     const saveButton = document.createElement("button");
     const deleteButton = document.createElement("button");
 
@@ -71,6 +115,7 @@ function editMode(todoItemNode, todoName, projTitle, i){
     editTitle.setAttribute("type","text");
     editTitle.setAttribute("placeholder","Add Title");
     editTitle.setAttribute("class","titleInput");
+    editTitle.setAttribute("width","1fr");
 
     editDescription.value = projectList[i].description;
     editDescription.setAttribute("type","text");
@@ -83,35 +128,6 @@ function editMode(todoItemNode, todoName, projTitle, i){
     editDueDate.setAttribute("class","duedateInput");
 
     
-    editPriority.setAttribute("placeholder","Add priority");
-    editPriority.setAttribute("class","duedatePriority");
-    editPriority.setAttribute("type","select-one");
-
-    let high = document.createElement("option");
-    let medium = document.createElement("option");
-    let low = document.createElement("option");
-
-    high.textContent = "high";
-    medium.textContent = "medium";
-    low.textContent = "low";
-
-    editPriority.add(high);
-    editPriority.add(medium);
-    editPriority.add(low);
-
-    editPriority.value = projectList[i].priority;
-
-
-    editCurrProject.setAttribute("type","select-one");
-    
-    Object.keys(localStorage).forEach( (key) => {
-
-        let option = document.createElement("option");
-        option.textContent = key;
-        editCurrProject.add(option);
-    })
-
-    editCurrProject.value = projTitle;
 
     saveButton.setAttribute("type","button");
     saveButton.textContent = "Save";
@@ -139,19 +155,33 @@ function editMode(todoItemNode, todoName, projTitle, i){
     });
 
 
+    // editTodoItem.appendChild(editTitle);
 
-    editTodoItem.appendChild(editTitle);
-    editTodoItem.appendChild(editDescription);
-    editTodoItem.appendChild(editDueDate);
-    editTodoItem.appendChild(editPriority);
-    editTodoItem.appendChild(editCurrProject);
-    editTodoItem.appendChild(saveButton);
-    editTodoItem.appendChild(deleteButton);
+    // editTodoItem.appendChild(editDescription);
 
-    const todoListItem = document.createElement('li');
-    todoListItem.appendChild(editTodoItem);
+    // editTodoItem.appendChild(editDueDate);
+    // editTodoItem.appendChild(editPriority);
+    // editTodoItem.appendChild(editCurrProject);
+    // editTodoItem.appendChild(saveButton);
+    // editTodoItem.appendChild(deleteButton);
 
-    list.replaceChild(todoListItem,todoItemNode);
+     const editFields = document.createElement("div");
+     editFields.setAttribute("id","id"+i);
+     editFields.setAttribute("class","singletodo reset");
+
+
+    // todoListItem.appendChild(editTodoItem);
+    editFields.appendChild(editTitle);
+    editFields.appendChild(editDescription);
+    editFields.appendChild(editDueDate);
+    editFields.appendChild(editPriority);
+    editFields.appendChild(editCurrProject);
+    editFields.appendChild(saveButton);
+    editFields.appendChild(deleteButton);
+
+    list.replaceChild(editFields,todoItemNode);
+
+  
 
 }
 
@@ -163,22 +193,42 @@ function displayProj(projTitle){
 
     document.querySelector(".projnamespan").textContent = "";
     document.querySelector(".projnamespan").textContent = projTitle;
-    document.querySelector(".todos").textContent = "";
-    const list = document.querySelector(".todos");
+
+    const list = document.querySelector(".todoslist");
+    if(list !== null) list.textContent = "";
 
     for(let i = 0; i<projList.length; i++){
-        const displayTodo = document.createElement("li");
+        const todoContainer = document.createElement("div");
+        //todoContainer.setAttribute("class","singletodo");
+        
         
         const displayTodoName = document.createElement("span");
         const displayTodoDesc = document.createElement("span");
-        const displayColon = document.createElement("span");
+        const displayTodoDueDate = document.createElement("span");
+        const displayTodoPriority = document.createElement("span");
+        const displayTodoProject = document.createElement("span");
+        const buttonPlaceholder = document.createElement("span");
+        
+        console.log(`currprojname is ${projList[i].currProjectName}`);
         displayTodoName.textContent = projList[i].title;
         displayTodoDesc.textContent = projList[i].description;
-        displayColon.textContent = ": ";
-        displayTodo.appendChild(displayTodoName);
-        displayTodo.appendChild(displayColon);
-        displayTodo.appendChild(displayTodoDesc);
-        const displayTodoWithListener = addListener(displayTodo, displayTodoName, projTitle, i);
+        displayTodoDueDate.textContent = projList[i].dueDate;
+        displayTodoPriority.textContent = projList[i].priority;
+        displayTodoProject.textContent = projList[i].currProjectName;
+        
+    
+       
+        todoContainer.appendChild(displayTodoName);
+        todoContainer.appendChild(displayTodoDesc);
+        todoContainer.appendChild(displayTodoDueDate);
+        todoContainer.appendChild(displayTodoPriority);
+        todoContainer.appendChild(displayTodoProject);
+        todoContainer.appendChild(buttonPlaceholder);
+        todoContainer.appendChild(buttonPlaceholder);
+
+        const displayTodoWithListener = addListener(todoContainer, displayTodoName, projTitle, i);
+        displayTodoWithListener.setAttribute("class","singletodo");
+        displayTodoWithListener.setAttribute("id","id"+i);
         list.appendChild(displayTodoWithListener);
     }
     

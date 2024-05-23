@@ -1,3 +1,14 @@
+input {
+    min-width: 0;
+}
+
+.reset {
+    all: unset;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
 .container {
     display: grid;
     grid-template-columns: 30% 70%;
@@ -33,10 +44,35 @@ li {
     border-color: black;
 }
 
-.titleInput {
+/* .titleInput {
     width: 75px;
 }
 
 .descInput {
     width: 150px;
+} */
+
+.todosheader {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 1fr;
+}
+
+.todoname {
+    background-color: azure;
+}
+
+.header {
+    background-color: azure;
+}
+
+.todoslist {
+    display: flex;
+    flex-direction: column;
+}
+
+.singletodo {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: 1fr;
 }
